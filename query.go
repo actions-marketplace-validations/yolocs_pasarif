@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -40,6 +41,13 @@ var queryCmd = &cobra.Command{
 			}
 		case "count":
 			fmt.Fprintf(cmd.OutOrStderr(), "%d", len(filtered))
+
+		case "ids":
+			var ids []string
+			for _, res := range filtered {
+				ids = append(ids, res.Rule.ID)
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), strings.Join(ids, ","))
 		}
 
 		return nil
@@ -97,7 +105,7 @@ func levelMatch(res *DenormalizedResult, level string) bool {
 }
 
 func init() {
-	queryCmd.Flags().StringVarP(&queryVerbosity, "verbosity", "v", "default", "Query result verbosity level. Allowed values are [default, count]")
+	queryCmd.Flags().StringVarP(&queryVerbosity, "verbosity", "v", "default", "Query result verbosity level. Allowed values are [default, count, ids]")
 	queryCmd.Flags().StringArrayVarP(&queryPaths, "file", "f", nil, "File path(s) to the SARIF")
 	queryCmd.MarkFlagRequired("file")
 
