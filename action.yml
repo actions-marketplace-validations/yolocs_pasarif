@@ -18,7 +18,7 @@ runs:
     - shell: bash
       run: |
         #!/bin/bash
-        log_info "installing pasarif via 'go install' from its main version"
+        echo "installing pasarif via 'go install' from its main version"
         GOBIN=$(go env GOPATH)/bin
         go install github.com/yolocs/pasarif@main
         ln -s $GOBIN/pasarif ${{ inputs.install-dir}}/pasarif
