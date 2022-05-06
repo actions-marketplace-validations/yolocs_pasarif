@@ -1,0 +1,31 @@
+# action.yml
+name: pasarif
+author: yolocs
+description: 'Installs pasarif and includes it in your path'
+branding:
+  icon: 'package'
+  color: 'blue'
+# This is pinned to the last major release, we have to bump it for each action version.
+inputs:
+  install-dir:
+    description: 'Where to install the pasarif binary'
+    required: false
+    default: '$HOME/.pasarif'
+runs:
+  using: "composite"
+  steps:
+    # We verify the version against a SHA **in the published action itself**, not in the GCS bucket.
+    - shell: bash
+      run: |
+        #!/bin/bash
+        log_info "installing pasarif via 'go install' from its main version"
+        GOBIN=$(go env GOPATH)/bin
+        go install github.com/yolocs/pasarif@main
+        ln -s $GOBIN/pasarif ${{ inputs.install-dir}}/pasarif
+        exit 0
+    - if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
+      run:  echo "${{ inputs.install-dir }}" >> $GITHUB_PATH
+      shell: bash
+    - if: ${{ runner.os == 'Windows' }}
+      run:  echo "${{ inputs.install-dir }}" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      shell: pwsh
