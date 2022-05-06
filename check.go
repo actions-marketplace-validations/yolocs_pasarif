@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	checkPath        string
+	checkPaths       []string
 	checkLevelFilter string
 	checkRuleFilter  []string
 	checkThreshold   int
@@ -17,9 +17,13 @@ var checkCmd = &cobra.Command{
 	Use:   "check",
 	Short: "Query the results of a SARIF",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		filtered, err := query(checkPath, checkRuleFilter, checkLevelFilter)
-		if err != nil {
-			return err
+		var filtered []*DenormalizedResult
+		for _, f := range checkPaths {
+			partial, err := query(f, checkRuleFilter, checkLevelFilter)
+			if err != nil {
+				return err
+			}
+			filtered = append(filtered, partial...)
 		}
 
 		if len(filtered) > checkThreshold {
@@ -31,7 +35,7 @@ var checkCmd = &cobra.Command{
 }
 
 func init() {
-	checkCmd.Flags().StringVarP(&checkPath, "file", "f", "", "File path to the SARIF")
+	checkCmd.Flags().StringArrayVarP(&checkPaths, "file", "f", nil, "File path(s) to the SARIF")
 	checkCmd.MarkFlagRequired("file")
 
 	checkCmd.Flags().IntVarP(&checkThreshold, "threshold", "t", 0, "Only fail the check if len(results) > threshold")

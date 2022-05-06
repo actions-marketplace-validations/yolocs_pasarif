@@ -14,7 +14,7 @@ const (
 
 var (
 	queryVerbosity   string
-	queryPath        string
+	queryPaths       []string
 	queryLevelFilter string
 	queryRuleFilter  []string
 )
@@ -23,9 +23,13 @@ var queryCmd = &cobra.Command{
 	Use:   "query",
 	Short: "Query the results of a SARIF",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		filtered, err := query(queryPath, queryRuleFilter, queryLevelFilter)
-		if err != nil {
-			return err
+		var filtered []*DenormalizedResult
+		for _, f := range queryPaths {
+			partial, err := query(f, queryRuleFilter, queryLevelFilter)
+			if err != nil {
+				return err
+			}
+			filtered = append(filtered, partial...)
 		}
 
 		switch queryVerbosity {
@@ -94,7 +98,7 @@ func levelMatch(res *DenormalizedResult, level string) bool {
 
 func init() {
 	queryCmd.Flags().StringVarP(&queryVerbosity, "verbosity", "v", "default", "Query result verbosity level. Allowed values are [default, count]")
-	queryCmd.Flags().StringVarP(&queryPath, "file", "f", "", "File path to the SARIF")
+	queryCmd.Flags().StringArrayVarP(&queryPaths, "file", "f", nil, "File path(s) to the SARIF")
 	queryCmd.MarkFlagRequired("file")
 
 	queryCmd.Flags().StringArrayVarP(&queryRuleFilter, "rule", "r", nil, "Filter results by rule(s). By default it selects all.")
