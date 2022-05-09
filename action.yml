@@ -13,7 +13,7 @@ runs:
       run: |
         #!/bin/bash
         echo "installing pasarif via 'go install' from its main version"
-        go install github.com/yolocs/pasarif@main
+        go install github.com/yolocs/pasarif@latest
         exit 0
     - if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
       run:  echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
