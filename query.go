@@ -47,7 +47,7 @@ var queryCmd = &cobra.Command{
 			for _, res := range filtered {
 				ids = append(ids, res.Rule.ID)
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), strings.Join(ids, ","))
+			fmt.Fprintf(cmd.OutOrStdout(), strings.Join(ids, "|"))
 		}
 
 		return nil
